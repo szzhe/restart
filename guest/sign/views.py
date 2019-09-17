@@ -38,7 +38,7 @@ def event_manage(request):
     return render(request, "event_manage.html", {"user": username, "events":event_list})
 
 @login_required
-def search_name(request):
+def event_search(request):
     username = request.session.get('user', '')
     search_name = request.GET.get("name", "")
     search_name_bytes = search_name.encode(encoding="utf-8")
@@ -49,6 +49,14 @@ def search_name(request):
 def guest_manage(request):
     username = request.session.get('user', '')
     guest_list = Guest.objects.all()
+    return render(request, "guest_manage.html", {"user": username, "guests": guest_list})
+
+@login_required
+def guest_search(request):
+    username = request.session.get('user', '')
+    search_realname = request.GET.get('realname', '')
+    search_realname_bytes = search_realname.encode(encoding="utf-8")
+    guest_list = Guest.objects.filter(realname__contains=search_realname)
     return render(request, "guest_manage.html", {"user": username, "guests": guest_list})
 
 @login_required
