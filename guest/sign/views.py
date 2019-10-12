@@ -7,6 +7,8 @@ from django.contrib.auth.decorators import login_required
 
 from sign.models import Event, Guest
 
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 
 def index(request):
     # return HttpResponse("Hello Django!")
@@ -49,7 +51,17 @@ def event_search(request):
 def guest_manage(request):
     username = request.session.get('user', '')
     guest_list = Guest.objects.all()
-    return render(request, "guest_manage.html", {"user": username, "guests": guest_list})
+    paginator = Paginator(guest_list, 2) # # 创建每页2条数据的分页器
+    page = request.GET.get('page')
+    try:
+        contacts = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        contacts = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        contacts = paginator.page(paginator.num_pages)
+    return render(request, "guest_manage.html", {"user": username, "guests": contacts})
 
 @login_required
 def guest_search(request):
